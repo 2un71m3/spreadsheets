@@ -1,3 +1,4 @@
+// CellReference is an entity that maintains relation between a single cell and its positioning on the grid
 export class CellReference {
     private rowIdx: number;
     private columnIdx: number

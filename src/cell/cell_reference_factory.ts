@@ -1,4 +1,4 @@
-import { CellReference } from './reference';
+import { CellReference } from './cell_reference';
 
 export class CellReferenceFactory {
     public create(rowIdx: number, columnIdx: number): CellReference {

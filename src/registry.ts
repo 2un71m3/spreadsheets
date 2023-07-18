@@ -26,12 +26,17 @@ interface CellReferenceFactory {
     create(rowIdx: number, columnIdx: number): CellReference;
 }
 
+// Registry is a component that controls writing to data storage,
+// maintains all references and indexes related to that data
+// and also enables searching with grid references/labels
 export class Registry {
     private sheet: Spreadsheet;
     private lexer: Lexer;
     private cellReferenceFactory: CellReferenceFactory;
 
+    // index for "@label<n>" search (key is "@label" name)
     private labelsIndex: Record<string, CellReference> = {};
+    // index for fast access to all expressions (key is "(A..Z)n" reference)
     private expressionsIndex: Record<string, CellReference> = {};
 
     constructor(sheet: Spreadsheet, lexer: Lexer, cellReferenceFactory: CellReferenceFactory) {
@@ -45,7 +50,9 @@ export class Registry {
     }
 
     public addRow(cells: Cell[]): number {
+        // add an empty row first to receive the new row's numeric index
         let rowIdx = this.getSheet().addRow();
+        // write cell data into storage and update all relevant indexes
         cells.forEach(cell => {
             let columnIdx = this.getSheet().addCell(rowIdx, cell);
             if (cell.isLabel()) {
@@ -61,12 +68,14 @@ export class Registry {
         this.getSheet().replaceCell(rowIdx, columnIdx, cell);
     }
 
+    // allows easy iteration over all expressions
     public* expressionsGenerator(): Generator<CellReference> {
         for (let key in this.expressionsIndex) {
             yield this.expressionsIndex[key];
         }
     }
 
+    // searchGrid with "(A..Z)n" reference
     public searchGrid(reference: string): Cell | null {
         let {rowIdx, columnIdx} = this.lexer.parseGridReference(reference);
         let cell = this.getSheet().getCell(rowIdx, columnIdx);
@@ -76,6 +85,7 @@ export class Registry {
         return cell;
     }
 
+    // searchAtLabel with "@label<n>" reference
     public searchAtLabel(reference: string): Cell | null {
         let {label, offset} = this.lexer.parseLabelReference(reference);
         if (!(label in this.labelsIndex)) {
@@ -93,21 +103,23 @@ export class Registry {
         return this.sheet;
     }
 
-    private addLabel(cell: Cell, rowIdx: number, columnIdx: number) {
+    private addLabel(cell: Cell, rowIdx: number, columnIdx: number): string | null {
         let key = cell.getContent();
         if (key.length == 0) {
-            return;
+            return null;
         }
         if (key in this.labelsIndex) {
             throw new Error('Duplicate label found: ' + key);
         }
         this.labelsIndex[key] = this.cellReferenceFactory.create(rowIdx, columnIdx);
+        return key;
     }
 
-    private addExpression(rowIdx: number, columnIdx: number) {
+    private addExpression(rowIdx: number, columnIdx: number): string {
         let cellReference = this.cellReferenceFactory.create(rowIdx, columnIdx);
         let columnName = this.lexer.idxToColumnName(cellReference.getColumnIdx());
         let key = columnName + rowIdx;
         this.expressionsIndex[key] = cellReference;
+        return key;
     }
 }

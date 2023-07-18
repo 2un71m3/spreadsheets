@@ -19,6 +19,7 @@ interface Cell {
     getContent(): string;
 }
 
+// Calculator is a component responsible for evaluating all expressions and writing the results back into the spreadsheet
 export class Calculator {
     private registry: Registry;
     private lexer: Lexer;

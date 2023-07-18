@@ -1,16 +1,21 @@
+// Lexer is a component that contains all the syntax rules for external data
+// and is able to transform it to the internal representation
 export class Lexer {
     readonly SYMBOL_DELIMETER = '|';
     readonly SYMBOL_LABEL = '!';
     readonly SYMBOL_LABEL_REF = '@';
     readonly SYMBOL_EXPRESSION = '=';
 
+    // "(A..Z)n"
     readonly MATCH_COLUMN_NAME = /(?<name>[A-Z]+)(?<row>[1-9]+)/;
+    // "@label<n>"
     readonly MATCH_LABEL_OFFSET = /\<(?<offset>\d+)\>/;
 
     public parseColumns(data: string): string[] {
         return data.split(this.SYMBOL_DELIMETER);
     }
 
+    // parseGridReference converts "(A..Z)n" reference
     public parseGridReference(reference: string): {rowIdx: number, columnIdx: number} {
         let match = reference.match(this.MATCH_COLUMN_NAME);
         if (match === null || match.length == 0 || match.groups == undefined) {
@@ -21,6 +26,7 @@ export class Lexer {
         return {rowIdx, columnIdx};
     }
 
+    // parseLabelReference converts "@label<n>" reference
     public parseLabelReference(reference: string): {label: string, offset: number} {
         let match = reference.match(this.MATCH_LABEL_OFFSET);
         if (match === null || match.length == 0 || match.groups == undefined) {
@@ -42,6 +48,7 @@ export class Lexer {
         return data.startsWith(this.SYMBOL_EXPRESSION);
     }
 
+    // columnNameToIdx maps "(A..Z)" reference into numeric index
     public columnNameToIdx(name: string): number {
         let number = 0;
         for (let i = 0; i < name.length; i++) {
@@ -50,6 +57,7 @@ export class Lexer {
         return number - 1;
     }
 
+    // idxToColumnName maps numeric index into "(A..Z)" reference
     public idxToColumnName(index: number): string {
         index++;
         let name = '';

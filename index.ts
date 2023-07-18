@@ -2,7 +2,7 @@ import fs from 'fs';
 import readline from 'readline';
 import { Spreadsheet } from './src/spreadsheet';
 import { Lexer } from './src/lexer';
-import { CellReferenceFactory } from './src/cell/reference_factory';
+import { CellReferenceFactory } from './src/cell/cell_reference_factory';
 import { Registry } from './src/registry';
 import { CellFactory } from './src/cell/cell_factory';
 import { Parser } from './src/parser';

@@ -1,3 +1,4 @@
+// Spreadsheet is an abstract 2D data storage
 export class Spreadsheet {
     private rows: any[][] = [];
 
@@ -6,11 +7,13 @@ export class Spreadsheet {
     }
 
     public addRow(): number {
-        return this.rows.push([]) - 1;
+        let rowIdx = this.rows.push([]) - 1;
+        return rowIdx;
     }
 
     public addCell(rowIdx: number, cell: any): number {
-        return this.rows[rowIdx].push(cell) - 1;
+        let columnIdx = this.rows[rowIdx].push(cell) - 1;
+        return columnIdx;
     }
 
     public replaceCell(rowIdx: number, columnIdx: number, cell: any): void {

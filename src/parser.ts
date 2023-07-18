@@ -10,6 +10,9 @@ interface CellFactory {
     newCell(content: string): any;
 }
 
+// Parser receives the input data,
+// converts it into the internal representation
+// and passes it to the Registry/storage
 export class Parser {
     private registry: Registry;
     private lexer: Lexer;
